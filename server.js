@@ -164,14 +164,6 @@ app.delete('/productos/:id', async (req, res) => {
         res.status(500).send('Error al eliminar producto');
     }
 });
-
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Sistema Interno Lubricantes "LU" activo en http://localhost:${PORT}`);
-});
-
-
-
 /* ==========================================
    ventas.js - Rutas y lógica para la pantalla de ventas
    ========================================== */
