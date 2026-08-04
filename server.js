@@ -3,6 +3,7 @@ require('dotenv').config();
 
 const express = require('express');
 const { Pool } = require('pg');
+const multer = require('multer'); // 👈 AGREGA ESTA LÍNEA AQUÍ
 
 const app = express();
 
