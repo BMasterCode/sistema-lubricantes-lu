@@ -1,0 +1,41 @@
+<tr id="producto-<%= producto.id %>">
+  <td>
+    <% if (producto.imagen) { %>
+      <button class="btn-ver-imagen" onclick="verImagen('/uploads/<%= producto.imagen %>')">
+        🖼️ Ver Imagen
+      </button>
+    <% } else { %>
+      <span class="sin-imagen">Sin imagen</span>
+    <% } %>
+  </td>
+  <td><code><%= producto.codigo_barras || '-' %></code></td>
+  <td><strong><%= producto.nombre %></strong></td>
+  <td><%= producto.medida || '-' %></td>
+  <td><strong>Bs. <%= Number(producto.precio).toFixed(2) %></strong></td>
+  <td>
+    <% if (producto.stock <= 2) { %>
+      <span class="alerta-stock">⚠️ <%= producto.stock %> unidades</span>
+    <% } else { %>
+      <%= producto.stock %>
+    <% } %>
+  </td>
+  <td>📌 <%= producto.ubicacion %></td>
+  <td class="acciones">
+    <button 
+      class="btn-editar" 
+      hx-get="/productos/<%= producto.id %>/editar" 
+      hx-target="#producto-<%= producto.id %>" 
+      hx-swap="outerHTML">
+      ✏️ Editar
+    </button>
+
+    <button 
+      class="btn-eliminar" 
+      hx-delete="/productos/<%= producto.id %>" 
+      hx-confirm="¿Seguro que deseas eliminar este producto?" 
+      hx-target="#producto-<%= producto.id %>" 
+      hx-swap="outerHTML swap:0.2s">
+      🗑️ Eliminar
+    </button>
+  </td>
+</tr>

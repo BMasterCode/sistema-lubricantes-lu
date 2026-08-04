@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proveedores - Lubricantes "LU"</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+
+<body>
+
+    <!-- Encabezado Principal -->
+    <div class="header-principal">
+        <div>
+            <h1>🏭 Control de Proveedores</h1>
+            <p class="sub">Directorio de contacto, ubicación y productos que suministran</p>
+        </div>
+
+        <div class="grupo-botones-header">
+            <a href="/" class="btn-ir-historial">📦 Inventario</a>
+            <a href="/ventas" class="btn-ir-ventas">🛒 Punto de Venta</a>
+        </div>
+    </div>
+
+    <!-- Formulario para Registrar Nuevo Proveedor -->
+    <div class="panel">
+        <h3>+ Registrar Nuevo Proveedor</h3>
+        <form action="/proveedores" method="POST" style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <input type="text" name="nombre" placeholder="Nombre del Proveedor / Empresa"
+                style="flex: 2; min-width: 220px;" required>
+            <input type="text" name="telefono" placeholder="Número de Teléfono / WhatsApp"
+                style="flex: 1; min-width: 180px;">
+            <input type="text" name="productos_vende" placeholder="Productos que vende (ej. Aceites Mobil, Filtros Wix)"
+                style="flex: 3; min-width: 280px;" required>
+
+            <!-- Ubicación Completa -->
+            <input type="text" name="pais" placeholder="País (ej. Bolivia)" value="Bolivia"
+                style="flex: 1; min-width: 120px;">
+            <input type="text" name="departamento" placeholder="Departamento (ej. Cochabamba)"
+                style="flex: 1; min-width: 150px;">
+            <input type="text" name="ciudad" placeholder="Ciudad (ej. Quillacollo / Cercado)"
+                style="flex: 1; min-width: 150px;">
+            <input type="text" name="localidad" placeholder="Localidad / Zona" style="flex: 1; min-width: 150px;">
+
+            <button type="submit" class="btn-guardar" style="width: 100%; margin-top: 5px;">💾 Guardar
+                Proveedor</button>
+        </form>
+    </div>
+
+    <!-- Buscador de Proveedores -->
+    <div style="margin: 20px 0 10px 0;">
+        <input type="text" id="buscar-proveedor"
+            placeholder="🔍 Buscar proveedor por nombre, producto, teléfono, ciudad, departamento, localidad o país..."
+            onkeyup="filtrarProveedores()"
+            style="width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--color-borde); font-size: 0.95rem;">
+    </div>
+
+    <!-- Tabla de Proveedores -->
+    <table>
+        <thead>
+            <tr>
+                <th>Proveedor / Empresa</th>
+                <th>Teléfono / Contacto</th>
+                <th>Productos que Suministra</th>
+                <th>Ubicación (País / Depto / Ciudad / Localidad)</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-proveedores-body">
+            <% if (proveedores.length===0) { %>
+                <tr id="sin-proveedores">
+                    <td colspan="5" style="text-align: center; color: #94a3b8;">No hay proveedores registrados.</td>
+                </tr>
+                <% } %>
+
+                    <% proveedores.forEach(p=> { %>
+                        <%- include('partials/fila-proveedor', { p: p }) %>
+                            <% }); %>
+        </tbody>
+    </table>
+
+    <!-- MODAL DE EDICIÓN DE PROVEEDOR -->
+    <dialog id="modal-editar-proveedor"
+        style="border: none; border-radius: 12px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-width: 600px; width: 90%;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="margin: 0;">✏️ Editar Proveedor</h3>
+            <button onclick="document.getElementById('modal-editar-proveedor').close()"
+                style="background: none; border: none; font-size: 1.2rem; cursor: pointer;">✕</button>
+        </div>
+
+        <form id="form-editar-prov" hx-target="" hx-swap="outerHTML" hx-on::after-request="cerrarModalEditar()"
+            style="display: flex; flex-direction: column; gap: 10px;">
+            <input type="text" id="edit-nombre" name="nombre" placeholder="Nombre / Empresa" required
+                style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+            <input type="text" id="edit-telefono" name="telefono" placeholder="Teléfono"
+                style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+            <input type="text" id="edit-productos" name="productos_vende" placeholder="Productos que vende" required
+                style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="text" id="edit-pais" name="pais" placeholder="País"
+                    style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+                <input type="text" id="edit-departamento" name="departamento" placeholder="Departamento"
+                    style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+                <input type="text" id="edit-ciudad" name="ciudad" placeholder="Ciudad"
+                    style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+                <input type="text" id="edit-localidad" name="localidad" placeholder="Localidad"
+                    style="padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button type="submit" class="btn-guardar" style="flex: 1;">💾 Actualizar Cambios</button>
+                <button type="button" onclick="document.getElementById('modal-editar-proveedor').close()"
+                    style="padding: 10px; background: #e2e8f0; border: none; border-radius: 6px; cursor: pointer;">Cancelar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script>
+        // Función que se ejecuta al terminar la petición HTMX con éxito
+        function cerrarModalEditar() {
+            const modal = document.getElementById('modal-editar-proveedor');
+            if (modal) {
+                modal.close();
+            }
+        }
+        function prepararModalEditar(btn) {
+            // Leemos los datos de manera 100% segura desde los atributos data-* del botón
+            const id = btn.dataset.id;
+            const nombre = btn.dataset.nombre;
+            const telefono = btn.dataset.telefono;
+            const productos = btn.dataset.productos;
+            const pais = btn.dataset.pais;
+            const depto = btn.dataset.departamento;
+            const ciudad = btn.dataset.ciudad;
+            const localidad = btn.dataset.localidad;
+
+            const form = document.getElementById('form-editar-prov');
+
+            // Configurar atributos de HTMX para la fila específica
+            form.setAttribute('hx-put', `/proveedores/${id}`);
+            form.setAttribute('hx-target', `#proveedor-${id}`);
+            htmx.process(form);
+
+            // Llenar datos en los campos del modal
+            document.getElementById('edit-nombre').value = nombre;
+            document.getElementById('edit-telefono').value = telefono;
+            document.getElementById('edit-productos').value = productos;
+            document.getElementById('edit-pais').value = pais;
+            document.getElementById('edit-departamento').value = depto;
+            document.getElementById('edit-ciudad').value = ciudad;
+            document.getElementById('edit-localidad').value = localidad;
+
+            document.getElementById('modal-editar-proveedor').showModal();
+        }
+
+        function filtrarProveedores() {
+            const textoInput = document.getElementById('buscar-proveedor').value.trim().toLowerCase();
+            const filas = document.querySelectorAll('tbody tr[id^="proveedor-"]');
+
+            if (!textoInput) {
+                filas.forEach(f => f.style.display = '');
+                return;
+            }
+
+            const palabrasClave = textoInput.split(/\s+/);
+
+            filas.forEach(fila => {
+                const textoFilaCompleto = fila.innerText.toLowerCase();
+                const coincideTodo = palabrasClave.every(palabra => textoFilaCompleto.includes(palabra));
+
+                if (coincideTodo) {
+                    fila.style.display = '';
+                } else {
+                    fila.style.display = 'none';
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

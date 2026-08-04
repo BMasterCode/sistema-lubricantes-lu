@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historial de Ventas - Lubricantes "LU"</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .tabla-historial {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    .tabla-historial th, .tabla-historial td {
+      padding: 12px;
+      border: 1px solid var(--color-borde);
+      text-align: left;
+    }
+    .tabla-historial th {
+      background-color: var(--color-azul-petroleo);
+      color: white;
+    }
+    .badge-pago {
+      background: var(--color-durazno);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+    .lista-prod-detalle {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 0.9rem;
+    }
+    .header-historial {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-historial">
+    <div>
+      <h1>📋 Historial de Ventas Realizadas</h1>
+      <p class="sub">Registro histórico de transacciones del negocio</p>
+    </div>
+    <a href="/ventas" class="btn-guardar" style="text-decoration: none;">🛒 Volver al Punto de Venta</a>
+  </div>
+
+  <table class="tabla-historial">
+    <thead>
+      <tr>
+        <th>N° Venta</th>
+        <th>Fecha y Hora</th>
+        <th>Método de Pago</th>
+        <th>Productos Llevados (Cant. x Nombre)</th>
+        <th>Total Cobrado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (ventas.length === 0) { %>
+        <tr>
+          <td colspan="5" style="text-align: center; color: #94a3b8;">No se han realizado ventas aún.</td>
+        </tr>
+      <% } %>
+
+      <% ventas.forEach(v => { %>
+        <tr>
+          <td><strong>#<%= v.id %></strong></td>
+          <td>
+            <%= new Date(v.fecha).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) %>
+            <small style="color: #64748b; display: block;">
+              <%= new Date(v.fecha).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) %>
+            </small>
+          </td>
+          <td><span class="badge-pago"><%= v.metodo_pago %></span></td>
+          <td>
+            <ul class="lista-prod-detalle">
+              <% v.productos.forEach(p => { %>
+                <li>
+                  <strong><%= p.cantidad %>x</strong> <%= p.nombre %> 
+                  <span style="color: #64748b;">(Bs. <%= Number(p.precio_unitario).toFixed(2) %> c/u)</span>
+                </li>
+              <% }); %>
+            </ul>
+          </td>
+          <td><strong style="color: var(--color-coral); font-size: 1.1rem;">Bs. <%= Number(v.total).toFixed(2) %></strong></td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+
+</body>
+</html>

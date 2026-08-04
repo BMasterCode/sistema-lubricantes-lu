@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punto de Venta - Lubricantes "LU"</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/pos.css">
+</head>
+
+<body>
+
+    <div class="pos-container">
+
+        <!-- COLUMNA IZQUIERDA: CARRITO DE VENTAS -->
+        <div class="pos-izquierda">
+            <div class="pos-header-carrito">
+                <h2>🛒 Venta Actual</h2>
+                <div style="display: flex; gap: 6px;">
+                    <a href="/ventas/historial" class="btn-volver">📋 Ventas Realizadas</a>
+                    <a href="/" class="btn-volver">📦 Inventario</a>
+                </div>
+            </div>
+
+            <!-- Campo de escáner en segundo plano (para lector de código de barras físico) -->
+            <input type="text" id="escaner-oculto" style="position: absolute; opacity: 0; pointer-events: none;"
+                autofocus>
+
+            <!-- Lista de Productos en el Carrito -->
+            <div class="carrito-lista" id="carrito-items">
+                <p class="carrito-vacio">Escanea un código o selecciona productos de la derecha...</p>
+            </div>
+
+            <!-- Resumen y Totales -->
+            <div class="carrito-resumen">
+                <div class="linea-total">
+                    <span>Total a Pagar:</span>
+                    <strong id="total-monto">Bs. 0.00</strong>
+                </div>
+
+                <button class="btn-pago-principal" onclick="abrirModalPago()">
+                    💳 Procesar Pago
+                </button>
+            </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: CATÁLOGO DE PRODUCTOS -->
+        <div class="pos-derecha">
+            <!-- Buscador superior -->
+            <div class="pos-buscador-bar">
+                <input type="search" id="buscar-pos" placeholder="🔍 Buscar por código, nombre o ubicación..."
+                    oninput="filtrarProductos()">
+            </div>
+
+            <!-- Grid de Productos -->
+            <div class="productos-grid" id="productos-grid">
+                <% productos.forEach(p=> { %>
+                    <div class="tarjeta-producto" data-id="<%= p.id %>" data-codigo="<%= p.codigo_barras || '' %>"
+                        data-nombre="<%= p.nombre %>" data-precio="<%= p.precio %>" data-stock="<%= p.stock %>"
+                        onclick="agregarAlCarritoFromData(this)">
+                        <div class="img-container">
+                            <% if(p.imagen) { %>
+                                <img src="/uploads/<%= p.imagen %>" alt="<%= p.nombre %>">
+                                <% } else { %>
+                                    <div class="no-img">🛢️</div>
+                                    <% } %>
+                        </div>
+                        <div class="info-prod">
+                            <h4>
+                                <%= p.nombre %>
+                            </h4>
+                            <p class="medida">
+                                <%= p.medida || '-' %>
+                            </p>
+                            <p class="ubicacion">📌 <%= p.ubicacion %>
+                            </p>
+                            <div class="footer-card">
+                                <span class="precio">Bs. <%= Number(p.precio).toFixed(2) %></span>
+                                <span class="stock">Stock: <%= p.stock %></span>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL SELECCIÓN DE PAGO (EFECTIVO / QR) -->
+    <dialog id="modal-pago">
+        <div class="modal-pago-box">
+            <button class="btn-cerrar-modal" onclick="document.getElementById('modal-pago').close()">✕</button>
+            <h3>Método de Pago</h3>
+            <h2 id="modal-total-display">Bs. 0.00</h2>
+
+            <div class="opciones-pago">
+                <button class="btn-opcion-pago" onclick="confirmarPago('Efectivo')">
+                    💵 Efectivo
+                </button>
+                <button class="btn-opcion-pago" onclick="confirmarPago('QR')">
+                    📲 Pago QR Simple
+                </button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- RECIBO OCULTO PARA IMPRESIÓN -->
+    <div id="ticket-impresion" class="ticket">
+        <h2>LUBRICANTES "LU"</h2>
+        <p class="centrado">Atención y Servicio Automotriz</p>
+        <p class="centrado">Tel: 67436241 - Quillacollo</p>
+
+        <div class="linea-separadora"></div>
+
+        <p id="ticket-fecha"></p>
+        <p id="ticket-pago"></p>
+
+        <div class="linea-separadora"></div>
+
+        <div id="ticket-items"></div>
+
+        <div class="linea-separadora"></div>
+
+        <div class="total-ticket">
+            <span>TOTAL:</span>
+            <span id="ticket-total-monto"></span>
+        </div>
+
+        <div class="linea-separadora"></div>
+
+        <p class="centrado">¡Gracias por su preferencia!</p>
+        <p class="centrado">Conserve este ticket para cualquier reclamo.</p>
+    </div>
+
+    <!-- LÓGICA DEL CARRITO Y PAGO -->
+    <div id="datos-productos" data-productos='<%- JSON.stringify(productos) %>'></div>
+    <script>
+        let carrito = [];
+        const divProductos = document.getElementById('datos-productos');
+        const listaProductosJSON = JSON.parse(divProductos.dataset.productos);
+
+        // Redirigir siempre el foco al escáner físico
+        document.addEventListener('click', () => {
+            const buscador = document.getElementById('buscar-pos');
+            if (document.activeElement !== buscador) {
+                document.getElementById('escaner-oculto').focus();
+            }
+        });
+
+        // Detectar lectura de código de barras directo
+        let bufferEscaner = "";
+        document.addEventListener('keydown', (e) => {
+            if (document.activeElement === document.getElementById('buscar-pos')) return;
+
+            if (e.key === 'Enter') {
+                if (bufferEscaner.trim() !== "") {
+                    const prod = listaProductosJSON.find(p => p.codigo_barras === bufferEscaner.trim());
+                    if (prod) {
+                        agregarAlCarrito(prod);
+                    } else {
+                        alert("Producto no encontrado con el código: " + bufferEscaner);
+                    }
+                    bufferEscaner = "";
+                }
+            } else if (e.key.length === 1) {
+                bufferEscaner += e.key;
+            }
+        });
+
+        function agregarAlCarritoFromData(el) {
+            const id = parseInt(el.dataset.id);
+            const prod = listaProductosJSON.find(p => p.id === id);
+            if (prod) agregarAlCarrito(prod);
+        }
+
+        function agregarAlCarrito(producto) {
+            const existe = carrito.find(item => item.id === producto.id);
+
+            if (existe) {
+                if (existe.cantidad < producto.stock) {
+                    existe.cantidad++;
+                } else {
+                    alert("No hay más stock disponible para este producto.");
+                }
+            } else {
+                carrito.push({
+                    id: producto.id,
+                    nombre: producto.nombre,
+                    precio: parseFloat(producto.precio),
+                    stock: producto.stock,
+                    cantidad: 1
+                });
+            }
+            renderCarrito();
+        }
+
+        function cambiarCantidad(id, cambio) {
+            const item = carrito.find(i => i.id === id);
+            if (item) {
+                item.cantidad += cambio;
+                if (item.cantidad <= 0) {
+                    carrito = carrito.filter(i => i.id !== id);
+                } else if (item.cantidad > item.stock) {
+                    item.cantidad = item.stock;
+                    alert("Alcanzado el stock máximo disponible.");
+                }
+            }
+            renderCarrito();
+        }
+
+        function renderCarrito() {
+            const cont = document.getElementById('carrito-items');
+            if (carrito.length === 0) {
+                cont.innerHTML = '<p class="carrito-vacio">Escanea un código o selecciona productos de la derecha...</p>';
+                document.getElementById('total-monto').innerText = 'Bs. 0.00';
+                return;
+            }
+
+            let html = '';
+            let total = 0;
+
+            carrito.forEach(item => {
+                const subtotal = item.precio * item.cantidad;
+                total += subtotal;
+                html += `
+          <div class="item-carrito">
+            <div class="detalles-item">
+              <strong>${item.nombre}</strong>
+              <small>Bs. ${item.precio.toFixed(2)} c/u</small>
+            </div>
+            <div class="controles-cant">
+              <button onclick="cambiarCantidad(${item.id}, -1)">-</button>
+              <span>${item.cantidad}</span>
+              <button onclick="cambiarCantidad(${item.id}, 1)">+</button>
+            </div>
+            <div class="subtotal-item">
+              Bs. ${subtotal.toFixed(2)}
+            </div>
+          </div>
+        `;
+            });
+
+            cont.innerHTML = html;
+            document.getElementById('total-monto').innerText = `Bs. ${total.toFixed(2)}`;
+        }
+
+        function filtrarProductos() {
+            const textoInput = document.getElementById('buscar-pos').value.trim().toLowerCase();
+            const tarjetas = document.querySelectorAll('.tarjeta-producto');
+
+            // Si el buscador está vacío, mostrar todos los productos
+            if (!textoInput) {
+                tarjetas.forEach(t => t.style.display = 'flex');
+                return;
+            }
+
+            // Dividir la búsqueda en palabras clave separadas por espacios
+            // Ejemplo: "llanta 195-65" -> ["llanta", "195-65"]
+            const palabrasClave = textoInput.split(/\s+/);
+
+            tarjetas.forEach(t => {
+                const nombre = (t.dataset.nombre || '').toLowerCase();
+                const codigo = (t.dataset.codigo || '').toLowerCase();
+                const medida = (t.querySelector('.medida')?.innerText || '').toLowerCase();
+                const ubicacion = (t.querySelector('.ubicacion')?.innerText || '').toLowerCase();
+
+                // Crear un solo texto consolidado con todos los atributos del producto
+                const textoProductoCompleto = `${nombre} ${medida} ${codigo} ${ubicacion}`;
+
+                // El producto coincide si TODAS las palabras clave buscadas están presentes en su información
+                const coincideTodo = palabrasClave.every(palabra => textoProductoCompleto.includes(palabra));
+
+                if (coincideTodo) {
+                    t.style.display = 'flex';
+                } else {
+                    t.style.display = 'none';
+                }
+            });
+        }
+
+        function abrirModalPago() {
+            if (carrito.length === 0) {
+                alert("El carrito está vacío.");
+                return;
+            }
+            const total = carrito.reduce((acc, i) => acc + (i.precio * i.cantidad), 0);
+            document.getElementById('modal-total-display').innerText = `Bs. ${total.toFixed(2)}`;
+            document.getElementById('modal-pago').showModal();
+        }
+
+        async function confirmarPago(metodo) {
+            const total = carrito.reduce((acc, i) => acc + (i.precio * i.cantidad), 0);
+
+            const res = await fetch('/api/ventas/procesar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ carrito, metodoPago: metodo, total })
+            });
+
+            const data = await res.json();
+            if (data.ok) {
+                imprimirTicket(metodo, total);
+                carrito = [];
+                renderCarrito();
+                document.getElementById('modal-pago').close();
+                // Recargar stock de la página en segundo plano
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                alert("Error al guardar venta: " + data.mensaje);
+            }
+        }
+
+        function imprimirTicket(metodo, total) {
+            document.getElementById('ticket-fecha').innerText = "Fecha: " + new Date().toLocaleString();
+            document.getElementById('ticket-pago').innerText = "Pago: " + metodo;
+
+            let itemsHtml = '';
+            carrito.forEach(i => {
+                const subtotal = (i.precio * i.cantidad).toFixed(2);
+                itemsHtml += `
+      <div class="item-ticket-linea">
+        <span>${i.cantidad}x ${i.nombre}</span>
+        <span>Bs. ${subtotal}</span>
+      </div>
+    `;
+            });
+
+            document.getElementById('ticket-items').innerHTML = itemsHtml;
+            document.getElementById('ticket-total-monto').innerText = "Bs. " + total.toFixed(2);
+
+            // Abrir cuadro de diálogo de impresión
+            window.print();
+        }
+    </script>
+</body>
+
+</html>

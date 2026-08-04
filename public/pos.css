@@ -1,0 +1,273 @@
+/* Layout Principal POS */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-fondo);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.pos-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Columna Izquierda (Carrito) */
+.pos-izquierda {
+  width: 400px;
+  background-color: #ffffff;
+  border-right: 2px solid var(--color-borde);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.pos-header-carrito {
+  padding: 15px 20px;
+  background-color: var(--color-azul-petroleo);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pos-header-carrito h2 { margin: 0; font-size: 1.2rem; }
+.btn-volver { color: white; text-decoration: none; font-size: 0.85rem; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 4px; }
+
+.carrito-lista {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+}
+
+.carrito-vacio { text-align: center; color: #94a3b8; margin-top: 40px; }
+
+.item-carrito {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.detalles-item strong { display: block; font-size: 0.95rem; }
+.detalles-item small { color: #64748b; }
+
+.controles-cant {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.controles-cant button {
+  background: var(--color-purpura);
+  color: white;
+  border: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.subtotal-item { font-weight: bold; color: var(--color-azul-petroleo); }
+
+.carrito-resumen {
+  padding: 20px;
+  background: #f8fafc;
+  border-top: 2px solid var(--color-borde);
+}
+
+.linea-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+}
+
+.btn-pago-principal {
+  width: 100%;
+  padding: 15px;
+  background-color: var(--color-coral);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Columna Derecha (Catálogo) */
+.pos-derecha {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #f1f5f9;
+}
+
+.pos-buscador-bar {
+  padding: 15px 20px;
+  background: white;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.pos-buscador-bar input {
+  width: 100%;
+  font-size: 1.1rem;
+  padding: 12px;
+}
+
+.productos-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 15px;
+  align-content: start;
+}
+
+.tarjeta-producto {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid var(--color-borde);
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.tarjeta-producto:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.img-container {
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8fafc;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.img-container img { max-height: 100%; max-width: 100%; object-fit: contain; }
+.no-img { font-size: 2.5rem; }
+
+.info-prod h4 { margin: 0 0 4px 0; font-size: 0.95rem; color: var(--color-azul-petroleo); }
+.info-prod p { margin: 0; font-size: 0.8rem; color: #64748b; }
+
+.footer-card {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.footer-card .precio { color: var(--color-coral); }
+
+/* Modal de Pagos */
+.modal-pago-box {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
+  width: 320px;
+}
+
+.opciones-pago { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+
+.btn-opcion-pago {
+  padding: 14px;
+  font-size: 1.1rem;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  background: #f8fafc;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-opcion-pago:hover { background: var(--color-durazno); }
+
+/* Formato de Ticket de Impresión */
+.ticket { display: none; }
+
+/* Estilos exclusivos al momento de imprimir */
+@media print {
+  /* 1. Definir el tamaño del papel térmico de la impresora */
+  @page {
+    size: 80mm auto; /* Ancho: 80mm | Alto: Automático según el largo del contenido */
+    margin: 0;      /* Elimina los márgenes del navegador (fecha/hora/URL) */
+  }
+
+  /* Si tu impresora usa papel más angosto de 57mm / 58mm, usa esto en su lugar:
+  @page {
+    size: 57mm auto;
+    margin: 0;
+  }
+  */
+
+  /* 2. Ocultar todo el sistema POS web */
+  body * { 
+    visibility: hidden; 
+  }
+
+  /* 3. Mostrar únicamente el contenedor del ticket */
+  #ticket-impresion, #ticket-impresion * { 
+    visibility: visible; 
+  }
+
+  /* 4. Formato y diseño exacto de la factura de supermercado */
+  #ticket-impresion {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 72mm;               /* Ancho imprimible dejando un pequeño margen físico */
+    padding: 4mm;
+    font-family: 'Courier New', Courier, monospace; /* Fuente estilo caja registradora */
+    font-size: 11px;
+    line-height: 1.2;
+    color: #000;
+  }
+
+  /* Centrar encabezados */
+  #ticket-impresion h2, 
+  #ticket-impresion p.centrado {
+    text-align: center;
+    margin: 2px 0;
+  }
+
+  #ticket-impresion h2 {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  /* Separadores punteados */
+  .linea-separadora {
+    border-top: 1px dashed #000;
+    margin: 6px 0;
+  }
+
+  /* Alineación de ítems del ticket */
+  .item-ticket-linea {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3px;
+  }
+
+  .total-ticket {
+    font-size: 13px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+  }
+}

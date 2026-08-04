@@ -1,0 +1,28 @@
+<tr id="producto-<%= producto.id %>">
+  <td>
+    <label class="input-file-mini">
+      📷 Cambiar
+      <input type="file" name="imagen" accept="image/*" form="form-edit-<%= producto.id %>">
+    </label>
+  </td>
+  <td><input type="text" name="codigo_barras" value="<%= producto.codigo_barras || '' %>" form="form-edit-<%= producto.id %>" style="width: 100px;"></td>
+  <td><input type="text" name="nombre" value="<%= producto.nombre %>" form="form-edit-<%= producto.id %>" required></td>
+  <td><input type="text" name="medida" value="<%= producto.medida || '' %>" form="form-edit-<%= producto.id %>"></td>
+  <td><input type="number" step="0.01" name="precio" value="<%= producto.precio %>" form="form-edit-<%= producto.id %>" style="width: 80px;" required></td>
+  <td><input type="number" name="stock" value="<%= producto.stock %>" form="form-edit-<%= producto.id %>" style="width: 70px;" required></td>
+  <td><input type="text" name="ubicacion" value="<%= producto.ubicacion %>" form="form-edit-<%= producto.id %>" required></td>
+  <td class="acciones">
+    <form id="form-edit-<%= producto.id %>" 
+          hx-put="/productos/<%= producto.id %>" 
+          hx-target="#producto-<%= producto.id %>" 
+          hx-swap="outerHTML"
+          hx-encoding="multipart/form-data">
+    </form>
+    <button type="submit" form="form-edit-<%= producto.id %>" class="btn-guardar-edicion">💾 Guardar</button>
+    <button type="button" 
+            hx-get="/productos/<%= producto.id %>" 
+            hx-target="#producto-<%= producto.id %>" 
+            hx-swap="outerHTML" 
+            class="btn-cancelar">❌ Cancelar</button>
+  </td>
+</tr>

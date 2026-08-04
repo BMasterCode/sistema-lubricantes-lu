@@ -1,0 +1,503 @@
+/* ==========================================
+   PALETA DE COLORES - LUBRICANTES "LU"
+   ========================================== */
+:root {
+    --color-durazno: #F8B195;
+    /* Fondo general / Detalles claros */
+    --color-coral: #F67280;
+    /* Botones / Acentos brillantes */
+    --color-malva: #C06C84;
+    /* Alertas / Bordes / Acentos secundarios */
+    --color-purpura: #6C5B7B;
+    /* Subtítulos / Detalles de tabla */
+    --color-azul-petroleo: #355C7D;
+    /* Encabezados / Botón principal / Elementos fuertes */
+
+    /* Aplicación de colores */
+    --color-principal: var(--color-azul-petroleo);
+    --color-acento: var(--color-malva);
+    --color-exito: var(--color-coral);
+    --color-exito-hover: #e05563;
+    --color-alerta-bg: #fde8e8;
+    --color-alerta-texto: #c0392b;
+    --color-fondo: #fcf5f2;
+    /* Un tono hueso suave basado en el durazno */
+    --color-tarjeta: #ffffff;
+    --color-texto: #2d3748;
+    --color-borde: #ebd8d0;
+}
+
+/* ==========================================
+   encabezados y boton de ventas
+   ========================================== */
+.header-principal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.header-principal .sub {
+    margin-bottom: 0;
+}
+
+/* Grupo de Botones del Encabezado Principal */
+.grupo-botones-header {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Botón de Historial de Ventas */
+.btn-ir-historial {
+    background-color: var(--color-exito);
+    color: white;
+    text-decoration: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: transform 0.15s ease, background-color 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-ir-historial:hover {
+    background-color: var(--color-exito-hover);
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btn-ir-ventas {
+    background-color: var(--color-coral);
+    color: white;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: transform 0.15s ease, background-color 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-ir-ventas:hover {
+    background-color: var(--color-exito-hover);
+    transform: translateY(-2px);
+}
+
+/* Ajuste Responsivo para Celulares */
+@media (max-width: 600px) {
+    .grupo-botones-header {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .btn-ir-historial,
+    .btn-ir-ventas {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+/* ==========================================
+   ESTILOS GENERALES
+   ========================================== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    line-height: 1.5;
+}
+
+/* Encabezados */
+h1 {
+    color: var(--color-azul-petroleo);
+    margin-top: 0;
+    margin-bottom: 4px;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+p.sub {
+    color: var(--color-purpura);
+    margin-top: 0;
+    margin-bottom: 24px;
+    font-size: 0.95rem;
+}
+
+/* ==========================================
+   PANELES Y TARJETAS
+   ========================================== */
+.panel {
+    background: var(--color-tarjeta);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(53, 92, 125, 0.08);
+    margin-bottom: 20px;
+    border: 1px solid var(--color-borde);
+}
+
+.panel h3 {
+    margin-top: 0;
+    margin-bottom: 14px;
+    color: var(--color-azul-petroleo);
+    font-size: 1.1rem;
+}
+
+/* ==========================================
+   DISEÑO RESPONSIVO - CONTROLES Y BÚSQUEDA
+   ========================================== */
+
+/* Ajuste general del panel de búsqueda */
+.panel-busqueda {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Forzar que el input de búsqueda sea grande y cómodo */
+.panel-busqueda .input-buscar {
+    flex: 1 1 50px;
+    /* Crece si hay espacio, pero no baja de 300px */
+    width: 100%;
+    min-height: 45px;
+    font-size: 1rem;
+    padding: 10px 14px;
+}
+
+/* Ajustes específicos para pantallas pequeñas (Celulares) */
+@media (max-width: 600px) {
+
+    /* En celulares, acomodar búsqueda y botón en filas separadas de ancho completo */
+    .panel-busqueda {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .panel-busqueda .input-buscar {
+        max-width: 100%;
+        width: 100%;
+        font-size: 0.95rem;
+    }
+
+    .btn-camara {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    /* Formulario de registro en celulares */
+    form {
+        flex-direction: column;
+    }
+
+    form input,
+    form .input-file-wrapper,
+    form .btn-guardar {
+        width: 100% !important;
+        flex: none !important;
+    }
+}
+
+/* ==========================================
+   FORMULARIO E INPUTS
+   ========================================== */
+form {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+input {
+    padding: 10px 14px;
+    border: 1px solid var(--color-borde);
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #fffaf8;
+    color: var(--color-texto);
+    transition: all 0.2s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--color-malva);
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(192, 108, 132, 0.2);
+}
+
+/* Botón Guardar */
+.btn-guardar {
+    padding: 10px 20px;
+    background-color: var(--color-coral);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.btn-guardar:hover {
+    background-color: var(--color-exito-hover);
+}
+
+/* Buscador */
+.input-buscar {
+    width: 100%;
+    max-width: 450px;
+    font-size: 15px;
+    border: 2px solid var(--color-malva);
+    background-color: #ffffff;
+}
+
+/* ==========================================
+   TABLA DE INVENTARIO
+   ========================================== */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--color-tarjeta);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--color-borde);
+}
+
+th,
+td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-borde);
+}
+
+th {
+    background-color: var(--color-azul-petroleo);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tbody tr:hover {
+    background-color: #fdf6f3;
+}
+
+/* Resaltar stock crítico */
+.alerta-stock {
+    color: var(--color-alerta-texto);
+    font-weight: 700;
+    background-color: var(--color-alerta-bg);
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-block;
+    border: 1px solid #f8b4b4;
+    font-size: 0.88rem;
+}
+
+/* ==========================================
+   editar y eliminar botones
+   ========================================== */
+
+/* Botones de acciones en la tabla */
+.acciones {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.btn-editar,
+.btn-eliminar,
+.btn-guardar-edicion,
+.btn-cancelar {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.btn-editar {
+    background-color: var(--color-purpura);
+    color: white;
+}
+
+.btn-eliminar {
+    background-color: var(--color-alerta-texto);
+    color: white;
+}
+
+.btn-guardar-edicion {
+    background-color: var(--color-coral);
+    color: white;
+}
+
+.btn-cancelar {
+    background-color: #94a3b8;
+    color: white;
+}
+
+.btn-editar:hover,
+.btn-eliminar:hover,
+.btn-guardar-edicion:hover,
+.btn-cancelar:hover {
+    opacity: 0.85;
+}
+
+
+/* ==========================================
+   ver imagen botón
+   ========================================== */
+.btn-ver-imagen {
+    background-color: var(--color-azul-petroleo);
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.btn-ver-imagen:hover {
+    opacity: 0.9;
+}
+
+.sin-imagen {
+    color: #94a3b8;
+    font-size: 0.82rem;
+    font-style: italic;
+}
+
+/* Botón personalizado de subir archivo */
+.input-file-wrapper,
+.input-file-mini {
+    background-color: #fffaf8;
+    border: 1px dashed var(--color-malva);
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-malva);
+    display: inline-flex;
+    align-items: center;
+}
+
+.input-file-wrapper input[type="file"],
+.input-file-mini input[type="file"] {
+    display: none;
+}
+
+.input-file-wrapper:hover,
+.input-file-mini:hover {
+    background-color: #fcefe9;
+}
+
+/* Modal Emergente */
+dialog {
+    border: none;
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    max-width: 90vw;
+    max-height: 90vh;
+    background: transparent;
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(3px);
+}
+
+.modal-contenido {
+    position: relative;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-contenido img {
+    max-width: 80vw;
+    max-height: 75vh;
+    border-radius: 8px;
+    object-fit: contain;
+}
+
+.btn-cerrar-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--color-alerta-texto);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* ==========================================
+   Botón de abrir cámara
+   ========================================== */
+.btn-camara {
+    background-color: var(--color-coral);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: opacity 0.2s;
+}
+
+.btn-camara:hover {
+    opacity: 0.9;
+}
+
+.modal-contenido-camara {
+    position: relative;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+code {
+    background-color: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    color: var(--color-azul-petroleo);
+}

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lubricantes "LU" - Control Interno</title>
+
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <!-- Librería para escanear con la cámara del celular -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body>
+
+<<!-- Encabezado Principal con Botones de Navegación -->
+<div class="header-principal">
+  <div>
+    <h1>Lubricantes "LU"</h1>
+    <p class="sub">Panel Interno de Control de Productos y Ubicaciones</p>
+  </div>
+  
+  <!-- GRUPO DE BOTONES DE ACCESO RÁPIDO EN INDEX.EJS -->
+<div class="grupo-botones-header">
+  <a href="/proveedores" class="btn-ir-historial">
+    🏭 Proveedores
+  </a>
+  <a href="/ventas/historial" class="btn-ir-historial">
+    📋 Ventas Realizadas
+  </a>
+  <a href="/ventas" class="btn-ir-ventas">
+    🛒 Punto de Venta (POS)
+  </a>
+</div>
+
+
+  <!-- Panel de Nuevo Producto -->
+  <div class="panel">
+    <h3>+ Registrar Nuevo Repuesto / Aceite</h3>
+    <form 
+      hx-post="/productos" 
+      hx-target="#lista-productos" 
+      hx-swap="afterbegin" 
+      hx-encoding="multipart/form-data"
+      hx-on::after-request="this.reset()"
+    >
+      <input type="text" name="codigo_barras" id="input-codigo-nuevo" placeholder="Código de Barras" style="flex: 1;">
+      <input type="text" name="nombre" placeholder="Nombre (ej. Mobil Super 20W50)" style="flex: 2;" required>
+      <input type="text" name="medida" placeholder="Medida / Tipo (ej. Galón / R16)" style="flex: 1;">
+      <input type="number" step="0.01" name="precio" placeholder="Precio (Bs.)" style="width: 110px;" required>
+      <input type="number" name="stock" placeholder="Stock" style="width: 80px;" required>
+      <input type="text" name="ubicacion" placeholder="Ubicación (ej. Estante 3, Fila 2)" style="flex: 1.5;" required>
+      
+      <label class="input-file-wrapper">
+        📷 Subir Imagen
+        <input type="file" name="imagen" accept="image/*">
+      </label>
+
+      <button type="submit" class="btn-guardar">Guardar</button>
+    </form>
+  </div>
+
+  <!-- Panel de Búsqueda -->
+<div class="panel panel-busqueda">
+  <input 
+    type="search" 
+    id="input-buscar"
+    name="buscar" 
+    class="input-buscar"
+    placeholder="🔍 Escanea con lector físico o busca por nombre..." 
+    hx-post="/buscar" 
+    hx-trigger="input changed delay:200ms, search" 
+    hx-target="#lista-productos" 
+    hx-swap="innerHTML"
+    autofocus
+  >
+  
+  <button type="button" class="btn-camara" onclick="abrirCamara()">
+    📷 Escanear con Cámara
+  </button>
+</div>
+
+  <!-- Tabla de Inventario -->
+  <table>
+    <thead>
+      <tr>
+        <th>Imagen</th>
+        <th>Código</th>
+        <th>Nombre del Producto</th>
+        <th>Medida / Tipo</th>
+        <th>Precio</th>
+        <th>Stock</th>
+        <th>Ubicación Físicamente</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="lista-productos">
+      <% productos.forEach(producto => { %>
+        <%- include('partials/fila-producto', { producto: producto }) %>
+      <% }); %>
+    </tbody>
+  </table>
+
+  <!-- Modal Emergente para la Cámara de Fotos -->
+  <dialog id="modal-camara" onclick="if(event.target === this) cerrarCamara()">
+    <div class="modal-contenido-camara">
+      <button class="btn-cerrar-modal" onclick="cerrarCamara()">✕</button>
+      <h3>Escaneando Código...</h3>
+      <div id="reader" style="width: 300px; height: 300px;"></div>
+    </div>
+  </dialog>
+
+  <!-- Modal Emergente para Ver Imagen del Producto -->
+  <dialog id="modal-imagen" onclick="if(event.target === this) this.close()">
+    <div class="modal-contenido">
+      <button class="btn-cerrar-modal" onclick="document.getElementById('modal-imagen').close()">✕</button>
+      <img id="img-ampliada" src="" alt="Vista previa del producto">
+    </div>
+  </dialog>
+
+  <script>
+    // Ver imagen previa
+    function verImagen(url) {
+      document.getElementById('img-ampliada').src = url;
+      document.getElementById('modal-imagen').showModal();
+    }
+
+    // Configuración del Escáner de Cámara
+    let html5QrcodeScanner = null;
+
+    function abrirCamara() {
+  const modal = document.getElementById('modal-camara');
+  modal.showModal();
+
+  if (!html5QrcodeScanner) {
+    html5QrcodeScanner = new Html5Qrcode("reader");
+  }
+
+  // Configuración optimizada para códigos de barras en laptop y celular
+  const config = {
+    fps: 15,
+    qrbox: { width: 280, height: 120 }, // Recuadro horizontal especial para códigos de barras
+    formatsToSupport: [
+      Html5QrcodeSupportedFormats.EAN_13,
+      Html5QrcodeSupportedFormats.EAN_8,
+      Html5QrcodeSupportedFormats.CODE_128,
+      Html5QrcodeSupportedFormats.UPC_A,
+      Html5QrcodeSupportedFormats.UPC_E
+    ]
+  };
+
+  html5QrcodeScanner.start(
+    { facingMode: "environment" },
+    config,
+    (decodedText, decodedResult) => {
+      const inputBuscar = document.getElementById('input-buscar');
+      inputBuscar.value = decodedText;
+      
+      htmx.trigger(inputBuscar, 'input');
+      
+      cerrarCamara();
+    },
+    (errorMessage) => {
+      // Búsqueda en proceso
+    }
+  ).catch(err => {
+    alert("No se pudo acceder a la cámara: " + err);
+    cerrarCamara();
+  });
+}
+
+    function cerrarCamara() {
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.stop().then(() => {
+          document.getElementById('modal-camara').close();
+        }).catch(() => {
+          document.getElementById('modal-camara').close();
+        });
+      } else {
+        document.getElementById('modal-camara').close();
+      }
+    }
+  </script>
+
+</body>
+</html>

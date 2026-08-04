@@ -1,0 +1,38 @@
+<tr id="proveedor-<%= p.id %>">
+  <td><strong><%= p.nombre %></strong></td>
+  <td>
+    <% if (p.telefono) { %>
+      📞 <%= p.telefono %>
+    <% } else { %>
+      <span style="color: #94a3b8;">Sin número</span>
+    <% } %>
+  </td>
+  <td>📦 <%= p.productos_vende %></td>
+  <td>
+    📍 <%= [p.localidad, p.ciudad, p.departamento, p.pais].filter(Boolean).join(', ') %>
+  </td>
+  <td class="acciones">
+    <button 
+      class="btn-editar" 
+      style="background: #0284c7; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 5px;"
+      data-id="<%= p.id %>"
+      data-nombre="<%= p.nombre %>"
+      data-telefono="<%= p.telefono || '' %>"
+      data-productos="<%= p.productos_vende || '' %>"
+      data-pais="<%= p.pais || '' %>"
+      data-departamento="<%= p.departamento || '' %>"
+      data-ciudad="<%= p.ciudad || '' %>"
+      data-localidad="<%= p.localidad || '' %>"
+      onclick="prepararModalEditar(this)">
+      ✏️ Editar
+    </button>
+    <button 
+      class="btn-eliminar" 
+      hx-delete="/proveedores/<%= p.id %>" 
+      hx-confirm="¿Seguro que deseas eliminar a este proveedor?" 
+      hx-target="#proveedor-<%= p.id %>" 
+      hx-swap="outerHTML swap:0.2s">
+      🗑️ Eliminar
+    </button>
+  </td>
+</tr>

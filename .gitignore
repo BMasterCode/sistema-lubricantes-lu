@@ -1,0 +1,13 @@
+# Archivos de entorno y contraseñas secretas
+.env
+.env.local
+
+# Carpeta de dependencias de Node.js (ocupa mucho espacio)
+node_modules/
+
+# Imágenes subidas localmente (opcional)
+public/uploads/*
+
+# Archivos del sistema operativo o del editor
+.DS_Store
+.vscode/
